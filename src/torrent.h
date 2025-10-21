@@ -17,6 +17,19 @@ namespace torrent{
         int64_t piece_length{};
         std::string pieces;
         int64_t length{};
+
+        inline std::list<std::string> split_pieces() const{
+            std::list<std::string> result;
+            for(size_t i=0;i<this->pieces.length();i+=20){
+                std::string piece = this->pieces.substr(i,20);
+                std:;stringstream ss;
+                for(unsigned char piece_char:piece){
+                    ss<<std::hex<<std::setw(2)<<std::setfill('0')<<static_cast<int>(piece_char);
+                }
+                result.push_back(ss.str());
+            }
+            return result;
+        }
     };
 
     void from_json(const json& j,Info& info){
@@ -40,6 +53,18 @@ namespace torrent{
     struct Torrent{
         std::string announce;
         Info info;
+
+        [[nodiscard]] inline std::string get_info_hash() const{
+            json meta_info = this-> info;
+            std::string encoded_info = bencode::encode_bencode_value(meta_info);
+            return utils::crypto::sha1(encoded_info);
+        }
+
+        [[nodiscard]] inline std::string get_info_hash_hexString() const{
+            json meta_info= this-> info;
+            std::string encoded_info = bencode::encode_bencode_value(meta_info);
+            return utils::crypto::sha1_and_hex(encoded_info);
+        }
     };
 
     void from_json(const json& j,Torrent& torrent){

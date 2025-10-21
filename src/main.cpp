@@ -6,6 +6,7 @@
 #include<nlohmann/json.hpp>
 #include<spdlog/spdlog.h>
 
+#include "connection.h"
 #include "torrent.h"
 
 using json = nlohmann::json;
@@ -46,6 +47,21 @@ int main(int argc, char* argv[]) {
 
         for(const auto& item:pieces){
             std::cout<<item<<std::endl;
+        }
+    }
+    else if(command == "peers"){
+        if(argc < 3){
+            std::cerr<<"Usage: "<< argv[0]<<" peers <torrent_file>"<<std::endl;
+            return EXIT_FAILURE;
+        }
+
+        std::string torrent_file = argv[2];
+        torrent::Torrent torrent = torrent::decode_torrent(torrent_file);
+
+        std::vector<std::tuple<std::string,std::uint32_t>> peers = connection::get_peers(torrent);
+
+        for(const auto& item: peers){
+            std::cout<<std::get<0>(item)<<":"<<std::get<1>(item)<<std::endl;
         }
     }
     else{
