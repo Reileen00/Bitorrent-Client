@@ -22,6 +22,7 @@ json decode_bencoded_value(const std::string& encoded_value) {
         }
     } } else if(encoded_value[0] == 'i' && encoded_value.back() == 'e') {
         return json(std::stol(encoded_value.substr(1, encoded_value.length()-2)));
+    }
      else {
         throw std::runtime_error("Unhandled encoded value: " + encoded_value);
     }
