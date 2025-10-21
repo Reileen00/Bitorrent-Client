@@ -8,6 +8,14 @@
 
 using json = nlohmann::json;
 
+json decode_bencoded_list(const std::string& encoded_value, size_t& index) {
+    json result;
+    while(encoded_value[index] != 'e') {
+        result.push_back(decode_bencoded_value(encoded_value, index));
+    }
+    return result;
+}
+
 json decode_bencoded_value(const std::string& encoded_value) {
     if (std::isdigit(encoded_value[0])) {
         // Example: "5:hello" -> "hello"
@@ -22,6 +30,8 @@ json decode_bencoded_value(const std::string& encoded_value) {
         }
     } else if(encoded_value[0] == 'i' && encoded_value.back() == 'e') {
         return json(std::stol(encoded_value.substr(1, encoded_value.length()-2)));
+    } else if(encoded_value[0] == 'l' && encoded_value.back() == 'e') {
+        return decode_bencoded_list(encoded_value, index);
     }
      else {
         throw std::runtime_error("Unhandled encoded value: " + encoded_value);
