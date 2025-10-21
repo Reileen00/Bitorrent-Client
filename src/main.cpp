@@ -64,6 +64,31 @@ int main(int argc, char* argv[]) {
             std::cout<<std::get<0>(item)<<":"<<std::get<1>(item)<<std::endl;
         }
     }
+    else if (command == "handshake") {
+        if (argc < 3) {
+            std::cerr << "Usage: " << argv[0] << " handshake <torrent_file> <peer_ip>:<peer_port>"
+                      << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        std::string torrent_file = argv[2];
+
+        torrent::Torrent torrent = torrent::decode_torrent(torrent_file);
+
+        std::vector<std::tuple<std::string, std::uint32_t>> peers = connection::get_peers(torrent);
+
+        auto [peer_ip, peer_port] = peers[0];
+        std::string peer_id = connection::get_handshake(torrent, peer_ip, peer_port);
+
+        std::vector<uint8_t> peer_id_bytes(peer_id.begin(), peer_id.end());
+
+        std::stringstream ss;
+        for (const auto& item : peer_id_bytes) {
+            ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(item);
+        }
+
+        spdlog::info("Peer ID: {}", ss.str());
+    }
     else{
         std::cerr<<"Unknown command: "<<command<<std::endl;
         return 1;
