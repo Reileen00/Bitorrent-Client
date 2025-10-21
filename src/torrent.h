@@ -2,6 +2,7 @@
 #define BITTORRENT_STARTER_CPP_TORRENT_H
 
 #include<string>
+#include<list>
 
 #include<nholmann/json.hpp>
 
@@ -70,6 +71,21 @@ namespace torrent{
         std::string encoded_info = bencode::encode_bencode_value(info);
 
         return utils::crypto::sha1(encoded_info);
+    }
+
+    inline std::list<std::string> split_pieces(const std::string& pieces){
+        std::list<std::string> result;
+        for(size_t i=0;i<pieces.length();i+=20){
+            std::string piece = pieces.substr(i,20);
+
+            std::stringstream ss;
+
+            for(unsigned char piece_char:piece){
+                ss<<std::hex<<std::setw(2)<<std::setfill('0')<<static_cast<int>(piece_char);
+            }
+            result.push_back(ss.str());
+        }
+        return result;
     }
 }
 

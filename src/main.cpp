@@ -39,6 +39,14 @@ int main(int argc, char* argv[]) {
         std::string info_hash = torrent::calculate_info_hash(torrent);
 
         spdlog::info("Info Hash: {}",info_hash);
+
+        spdlog::info("Piece Length: {}",torrent.info.piece_length);
+
+        std::list<std::string> pieces = torrent::split_pieces(torrent.info.pieces);
+
+        for(const auto& item:pieces){
+            std::cout<<item<<std::endl;
+        }
     }
     else{
         std::cerr<<"Unknown command: "<<command<<std::endl;
